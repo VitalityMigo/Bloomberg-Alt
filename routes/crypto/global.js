@@ -4,9 +4,9 @@ const { getInterestRates, getHistoricVolatility } = require('../../controllers/c
 const router = express.Router();
 
 // Route pour 'crypto/global/metrics/interest-rates'
-router.get('/metrics/interest-rates', getInterestRates);
+router.get('/interest-rates', getInterestRates);
 
 // Route pour 'crypto/global/metrics/historic-volatility'
-router.get('/metrics/historic-volatility', getHistoricVolatility);
+router.get('/historic-volatility', getHistoricVolatility);
 
 module.exports = router;

@@ -12,6 +12,7 @@ const getAllInstruments = async (req, res) => {
             {
                 headers: { 'accept': 'application/json', 'content-type': 'application/json' }
             });
+            
 
         // Fonction pour filtrer les instruments
         const filtered = instruments.data.result.filter(i => {
@@ -24,7 +25,7 @@ const getAllInstruments = async (req, res) => {
                 (direction === undefined || T_direction === direction)
             );
         });
-        console.log(filtered)
+
         const response = filtered
             .sort((a, b) => a.option_details.expiry - b.option_details.expiry)
             .map(i => { 
