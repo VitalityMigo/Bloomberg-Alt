@@ -1,19 +1,19 @@
 const axios = require('axios');
 const formatDate = require("../../functions/polymarket/date");
+const searchMarkets = require("../../functions/polymarket/search")
 
 // Handler pour 'prediction/polymarket/markets'
+// AJOUTER LA PAGINATION POUR AVOIR TOUS LES MARCHE
 const getMarkets = async (req, res) => {
     const { name } = req.query;
     try {
 
         // Appel API avec les paramètres
-        const markets = await axios.get('https://gamma-api.polymarket.com/markets',
-            { closed: false, limit: "1000", order: "volumeNum", ascending: "false" },
-            {
-                headers: { 'accept': 'application/json', 'content-type': 'application/json' }
-            });
+        const markets = await axios.get('https://gamma-api.polymarket.com/markets', {
+            params: { closed: false, limit: "500", order: "volumeNum", ascending: "false"},
+            headers: { 'accept': 'application/json', 'content-type': 'application/json' }});
 
-        const response = markets.data
+            const response = searchMarkets(markets.data, name)
             .map(i => {
 
                 // Parser outcomes et outcomePrices
@@ -22,23 +22,23 @@ const getMarkets = async (req, res) => {
                 const spread = i.spread * 100
 
                 return {
-                    id: i.id,
                     market: i.question,
-                    [outcomes[0]]: "┃",
-                    probability:  (parseFloat(outcomePrices[0]) * 100).toFixed(1) + '%',
-                    bid: parseFloat((outcomePrices[0] * 100) + (spread / 2)).toFixed(1),
-                    ask: parseFloat((outcomePrices[0] * 100) - (spread / 2)).toFixed(1),
-                    ["│"]: "│",
-                    spread: spread,
-                    ["│"]: "│",
-                    bid: parseFloat((outcomePrices[0] * 100) + (spread / 2)).toFixed(1),
-                    ask: parseFloat((outcomePrices[0] * 100) - (spread / 2)).toFixed(1),
-                    probability:  (parseFloat(outcomePrices[0]) * 100).toFixed(1) + '%',
-                    [outcomes[1]]: "┃",
+                    yes: "┃",
+                    ["Y-Prob"]: parseFloat(parseFloat(outcomePrices[0]) * 100).toFixed(1) + "%",
+                    ["Y-Bid "]: parseFloat((outcomePrices[0] * 100) - (spread / 2)).toFixed(1),
+                    ["Y-Ask "]: parseFloat((outcomePrices[0] * 100) + (spread / 2)).toFixed(1),
+                   // ["⊢"]: "│",
+                    spread: parseFloat(spread).toFixed(1),
+                   // ["⊣"]: "│",
+                    ["N-Bid"]: parseFloat((outcomePrices[1] * 100) - (spread / 2)).toFixed(1),
+                    ["N-Ask"]: parseFloat((outcomePrices[1] * 100) + (spread / 2)).toFixed(1),
+                    ["N-Prob"]:  (parseFloat(outcomePrices[1]) * 100).toFixed(1) + "%",
+                    no: "┃",
                     resolution: formatDate(i.endDate),
-                    volume: i.volumeNum,
-                    liquidity: i.liquidityNum,
-                    link: `https://polymarket.com/event/${i.slug}`,
+                    volume: parseInt(i.volumeNum),
+                    liquidity: parseInt(i.liquidityNum),
+                    link: `https://polymarket.com/market/${i.slug}`,
+                    id: i.id,
                 }
             })
 
