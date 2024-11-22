@@ -1,0 +1,30 @@
+[
+    {
+      "id": 2,
+      "name": "Crypto"
+    },
+    {
+      "id": 6,
+      "name": "Stocks"
+    },
+    {
+      "id": 1,
+      "name": "Sports"
+    },
+    {
+      "id": 3,
+      "name": "Politics"
+    },
+    {
+      "id": 4,
+      "name": "Social"
+    },
+    {
+      "id": 7,
+      "name": "Lumy"
+    },
+    {
+      "id": 5,
+      "name": "Other"
+    }
+  ]
