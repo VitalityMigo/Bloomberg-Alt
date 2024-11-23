@@ -1,45 +1,45 @@
 const axios = require('axios');
+
 const formatDate = require("../../functions/limitless/date");
 const searchMarkets = require("../../functions/limitless/search")
+const { priceHistory } = require("../../functions/limitless/queries")
 
 // Handler pour 'prediction/limitless/markets'
 const getMarketsLimitless = async (req, res) => {
-    const { name, category, duration } = req.query;
+    const { name, category } = req.query;
     try {
 
         // Appel API avec les paramètres
-        const markets = await axios.get('https://gamma-api.polymarket.com/markets', {
-            params: { closed: false, limit: "500", order: "volumeNum", ascending: "false"},
-            headers: { 'accept': 'application/json', 'content-type': 'application/json' }});
+        const markets = await axios.get('https://api.limitless.exchange/markets/daily', {
+            params: { limit: 50 },
+            headers: { 'accept': '*/*', } //  'Cookie': limitless_key
+        });
 
-            const response = searchMarkets(markets.data, name)
+        const p_history = await priceHistory(markets.data.data.map(i => i.address))
+
+        const response = searchMarkets(markets.data.data, name)
             .map(i => {
 
-                // Parser outcomes et outcomePrices
-                const outcomes = JSON.parse(i.outcomes); // ["Yes", "No"]
-                const outcomePrices = JSON.parse(i.outcomePrices); // ["0.0035", "0.9965"]
-                const spread = i.spread * 100
+                const y_prob = p_history.find(a => a.id.toLowerCase() === i.address.toLowerCase() && a.isLast === true).price
+                const n_prob = 100 - y_prob
 
                 return {
-                    market: i.question,
+                    market: i.title,
                     yes: "┃",
-                    ["Y-Prob"]: parseFloat(parseFloat(outcomePrices[0]) * 100).toFixed(1) + "%",
-                    ["Y-Bid "]: parseFloat((outcomePrices[0] * 100) - (spread / 2)).toFixed(1),
-                    ["Y-Ask "]: parseFloat((outcomePrices[0] * 100) + (spread / 2)).toFixed(1),
-                   // ["⊢"]: "│",
-                    spread: parseFloat(spread).toFixed(1),
-                   // ["⊣"]: "│",
-                    ["N-Bid"]: parseFloat((outcomePrices[1] * 100) - (spread / 2)).toFixed(1),
-                    ["N-Ask"]: parseFloat((outcomePrices[1] * 100) + (spread / 2)).toFixed(1),
-                    ["N-Prob"]:  (parseFloat(outcomePrices[1]) * 100).toFixed(1) + "%",
+                    ["Y-Prob"]: parseFloat(y_prob).toFixed(1) + "%",
+                    ["Y-Return "]: parseFloat((100 - y_prob) * 100 / y_prob).toFixed(1),
+                    ["┃"]: "┃",
+                    ["N-Return"]: parseFloat((100 - n_prob) * 100 / n_prob).toFixed(1),
+                    ["N-Prob"]: parseFloat(n_prob).toFixed(1) + "%",
                     no: "┃",
-                    resolution: formatDate(i.endDate),
-                    volume: parseInt(i.volumeNum),
-                    liquidity: parseInt(i.liquidityNum),
-                    link: `https://polymarket.com/market/${i.slug}`,
-                    id: i.id,
+                    resolution: i.expirationDate,
+                    volume: parseInt(i.volumeFormatted),
+                    liquidity: parseInt(i.liquidityFormatted),
+                    quote: i.collateralToken.symbol,
+                    link: `https://limitless.exchange/markets/${i.address}`,
+                    id: i.address
                 }
-            })
+            }).sort((a, b) => b.volume - a.volume)
 
         res.json(response);
 
@@ -49,4 +49,39 @@ const getMarketsLimitless = async (req, res) => {
     }
 };
 
-module.exports = { getMarketsLimitless };
+// Handler pour 'prediction/limitless/history'
+const getMarketsHistoryLimitless = async (req, res) => {
+    const { id } = req.query;
+    try {
+
+        // Appel API avec les paramètres
+        const markets = await axios.get(`https://api.limitless.exchange/markets/${id}`, {
+            params: { limit: 50 },
+            headers: { 'accept': '*/*', }
+        });
+
+        // Price history
+        const p_history = await priceHistory([id])
+
+        // Objet de réponse 
+        const response = {
+            market: markets.data.title
+        }
+
+        // Response builder
+        let price = 0
+        for (const i of p_history) {
+            response[formatDate(i.timestamp)] = i.price ? i.price : price
+            price = i.price ? i.price : price
+        }
+
+        res.json(response);
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ error: 'Erreur lors de la récupération des instruments.' });
+    }
+};
+
+
+module.exports = { getMarketsLimitless, getMarketsHistoryLimitless };

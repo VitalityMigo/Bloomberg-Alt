@@ -17,7 +17,6 @@ const getMarkets = async (req, res) => {
             .map(i => {
 
                 // Parser outcomes et outcomePrices
-                const outcomes = JSON.parse(i.outcomes); // ["Yes", "No"]
                 const outcomePrices = JSON.parse(i.outcomePrices); // ["0.0035", "0.9965"]
                 const spread = i.spread * 100
 
