@@ -3,6 +3,8 @@
         "name": "Markets List",
         "description": "Display all the currently active Polymarket markets.",
         "endpoint": "/prediction/polymarket/markets",
+        "category":"Prediction",
+        "subCategory":"Polymarket",
         "data": {
             "table": {
                 "enableCharts": true,
@@ -194,184 +196,18 @@
     "polymarket_market_single": {
         "name": "Single Market",
         "description": "Display a Polymarket market basic data.",
-        "endpoint": "/prediction/polymarket/single",
+        "endpoint": "/prediction/polymarket/singlemarket",
         "data": {
             "table": {
-                "enableCharts": true,
-                "showAll": true,
-                "columnsDefs": [
-                    {
-                        "field": "market",
-                        "headerName": "Market",
-                        "chartDataType": "category",
-                        "cellDataType": "text",
-                        "formatterFn": "none",
-                        "renderFn": "titleCase",
-                        "width": 800,
-                        "maxWidth": 1000,
-                        "minWidth": 500,
-                        "hide": false,
-                        "pinned": "left"
-                    },
-                    {
-                        "field": "yes",
-                        "headerName": "Yes",
-                        "chartDataType": "excluded",
-                        "cellDataType": "text",
-                        "formatterFn": "none",
-                        "renderFn": "titleCase",
-                        "width": 25,
-                        "maxWidth": 100,
-                        "minWidth": 25,
-                        "hide": false
-                    },
-                    {
-                        "field": "Y-Prob",
-                        "headerName": "Y-Prob",
-                        "chartDataType": "series",
-                        "cellDataType": "number",
-                        "formatterFn": "percent",
-                        "width": 60,
-                        "maxWidth": 150,
-                        "minWidth": 25,
-                        "hide": false
-                    },
-                    {
-                        "field": "Y-Bid",
-                        "headerName": "Y-Bid",
-                        "chartDataType": "series",
-                        "cellDataType": "number",
-                        "width": 60,
-                        "maxWidth": 150,
-                        "minWidth": 25,
-                        "hide": false
-                    },
-                    {
-                        "field": "Y-Ask",
-                        "headerName": "Y-Ask",
-                        "chartDataType": "series",
-                        "cellDataType": "number",
-                        "width": 60,
-                        "maxWidth": 150,
-                        "minWidth": 25,
-                        "hide": false
-                    },
-                    {
-                        "field": "spread",
-                        "headerName": "Spread",
-                        "chartDataType": "series",
-                        "cellDataType": "number",
-                        "width": 60,
-                        "maxWidth": 150,
-                        "minWidth": 25,
-                        "hide": false
-                    },
-                    {
-                        "field": "N-Bid",
-                        "headerName": "N-Bid",
-                        "chartDataType": "series",
-                        "cellDataType": "number",
-                        "width": 60,
-                        "maxWidth": 150,
-                        "minWidth": 25,
-                        "hide": false
-                    },
-                    {
-                        "field": "N-Ask",
-                        "headerName": "N-Ask",
-                        "chartDataType": "series",
-                        "cellDataType": "number",
-                        "width": 60,
-                        "maxWidth": 150,
-                        "minWidth": 25,
-                        "hide": false
-                    },
-                    {
-                        "field": "N-Prob",
-                        "headerName": "N-Prob",
-                        "chartDataType": "series",
-                        "cellDataType": "number",
-                        "formatterFn": "percent",
-                        "width": 60,
-                        "maxWidth": 150,
-                        "minWidth": 25,
-                        "hide": false
-                    },
-                    {
-                        "field": "no",
-                        "headerName": "No",
-                        "chartDataType": "excluded",
-                        "cellDataType": "text",
-                        "formatterFn": "none",
-                        "renderFn": "titleCase",
-                        "width": 25,
-                        "maxWidth": 100,
-                        "minWidth": 25,
-                        "hide": false
-                    },
-                    {
-                        "field": "resolution",
-                        "headerName": "Resolution",
-                        "chartDataType": "series",
-                        "cellDataType": "date",
-                        "formatterFn": "none",
-                        "width": 85,
-                        "maxWidth": 200,
-                        "minWidth": 25,
-                        "hide": false
-                    },
-                    {
-                        "field": "volume",
-                        "headerName": "Volume",
-                        "chartDataType": "series",
-                        "cellDataType": "number",
-                        "formatterFn": "int",
-                        "renderFn": "titleCase",
-                        "width": 85,
-                        "maxWidth": 200,
-                        "minWidth": 25,
-                        "hide": false
-                    },
-                    {
-                        "field": "liquidity",
-                        "headerName": "Liquidity",
-                        "chartDataType": "series",
-                        "cellDataType": "number",
-                        "formatterFn": "int",
-                        "renderFn": "titleCase",
-                        "width": 85,
-                        "maxWidth": 200,
-                        "minWidth": 25,
-                        "hide": false
-                    },
-                    {
-                        "field": "link",
-                        "headerName": "Link",
-                        "chartDataType": "excluded",
-                        "cellDataType": "text",
-                        "width": 60,
-                        "maxWidth": 150,
-                        "minWidth": 25,
-                        "hide": false
-                    },
-                    {
-                        "field": "id",
-                        "headerName": "ID",
-                        "chartDataType": "category",
-                        "cellDataType": "text",
-                        "width": 60,
-                        "maxWidth": 150,
-                        "minWidth": 25,
-                        "hide": false
-                    }
-                ]
+                "enableCharts": false,
+                "showAll": true
             }
         },
         "params": [
             {
-                "type": "text",
-                "paramName": "name",
-                "value": "",
+                "type": "int",
+                "paramName": "naidme",
+                "value": null,
                 "label": "Market Name",
                 "show": true,
                 "description": "The market name or question"
