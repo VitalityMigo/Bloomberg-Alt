@@ -3,8 +3,8 @@
         "name": "Markets List",
         "description": "Display all the currently active Polymarket markets.",
         "endpoint": "/prediction/polymarket/markets",
-        "category":"Prediction",
-        "subCategory":"Polymarket",
+        "category": "Prediction",
+        "subCategory": "Polymarket",
         "data": {
             "table": {
                 "enableCharts": true,
@@ -185,6 +185,14 @@
                 "label": "Market Name",
                 "show": true,
                 "description": "The market name or question"
+            },
+            {
+                "type": "date",
+                "paramName": "last_res",
+                "value": null,
+                "label": "Max Date",
+                "show": true,
+                "description": "The market maximum resolution date"
             }
         ],
         "source": [
@@ -197,20 +205,32 @@
         "name": "Single Market",
         "description": "Display a Polymarket market basic data.",
         "endpoint": "/prediction/polymarket/singlemarket",
+        "category": "Prediction",
+        "subCategory": "Polymarket",
         "data": {
             "table": {
                 "enableCharts": false,
-                "showAll": true
+                "showAll": true,
+                "columnsDefs": [
+                    {
+                        "field": "0",
+                        "headerName": "Name"
+                    },
+                    {
+                        "field": "1",
+                        "headerName": "Value"
+                    }
+                ]
             }
         },
         "params": [
             {
-                "type": "int",
-                "paramName": "naidme",
-                "value": null,
-                "label": "Market Name",
-                "show": true,
-                "description": "The market name or question"
+                "paramName": "id",
+                "description": "Select a chain to get historical TVL",
+                "value": "255229",
+                "label": "Market",
+                "type": "endpoint",
+                "optionsEndpoint": "/prediction/polymarket/marketslabel"
             }
         ],
         "source": [

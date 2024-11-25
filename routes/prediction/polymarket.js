@@ -1,5 +1,5 @@
 const express = require('express');
-const { getMarkets, getSingleMarket, getPriceHistory } = require('../../controllers/prediction/polymarket');
+const { getMarkets, getSingleMarket, getPriceHistory, getMarketsName } = require('../../controllers/prediction/polymarket');
 
 const router = express.Router();
 
@@ -11,5 +11,8 @@ router.get('/singlemarket', getSingleMarket);
 
 // Routes pour 'prediction/polymarket/'
 router.get('/pricehistory', getPriceHistory);
+
+// Routes pour 'prediction/polymarket/'
+router.get('/marketslabel', getMarketsName);
 
 module.exports = router;

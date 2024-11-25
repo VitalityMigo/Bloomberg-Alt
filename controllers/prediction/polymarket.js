@@ -1,20 +1,25 @@
 const axios = require('axios');
 const { formatDate, formatDatePlain } = require("../../functions/polymarket/date");
 const searchMarkets = require("../../functions/polymarket/search")
+const { getTodayISO } = require("../../functions/global/date")
 
 // Handler pour 'prediction/polymarket/markets'
-// AJOUTER LA PAGINATION POUR AVOIR TOUS LES MARCHE
 const getMarkets = async (req, res) => {
     const { name, last_res, category } = req.query;
     try {
 
-        // On définit le tableau global
+        // On redéfinit last_res
+        const norm_last_res = last_res === 'null' ? null : last_res
+        const norm_name = name === 'null' ? null : name
+
+        // On définit le tableau global et la variable
         const markets = []
+        let offset = 0
 
         while (true) {
             // Appel API avec les paramètres
             const request = await axios.get('https://gamma-api.polymarket.com/markets', {
-                params: { closed: false, limit: "500", order: "volumeNum", ascending: "false" },
+                params: { closed: false, limit: "500", order: "volumeNum", ascending: "false", end_date_min: getTodayISO(), offset: offset },
                 headers: { 'accept': 'application/json', 'content-type': 'application/json' }
             });
 
@@ -24,11 +29,12 @@ const getMarkets = async (req, res) => {
             if (request.data.length < 500) {
                 break
             }
+
+            offset += 500
         }
 
-        const response = searchMarkets(markets.data, name)
-            .filter(i => category === undefined || i.category === category)
-            .filter(i => category === undefined || i.category === category)
+        const response = searchMarkets(markets, norm_name)
+            .filter(i => (!norm_last_res || i.endDate <= last_res) && i.marketType !== 'scalar' && i.outcomePrices)
             .map(i => {
 
                 // Parser outcomes et outcomePrices
@@ -55,7 +61,6 @@ const getMarkets = async (req, res) => {
                     id: i.id,
                 }
             })
-
 
         res.json(response);
 
@@ -94,9 +99,7 @@ const getSingleMarket = async (req, res) => {
         }
 
         // // Transposer l'objet en un tableau clé-valeur
-        // const transposed = Object.entries(response);
-
-        // console.log(transposed)
+        const transposed = Object.entries(response);
 
         res.json(transposed);
 
@@ -107,7 +110,6 @@ const getSingleMarket = async (req, res) => {
 };
 
 // Handler pour 'prediction/polymarket/pricehistory'
-// AJOUTER LA PAGINATION POUR AVOIR TOUS LES MARCHE
 const getPriceHistory = async (req, res) => {
     const { tokenId, interval } = req.query;
     try {
@@ -137,4 +139,48 @@ const getPriceHistory = async (req, res) => {
     }
 };
 
-module.exports = { getMarkets, getSingleMarket, getPriceHistory };
+// Handler pour 'prediction/polymarket/markets'
+const getMarketsName = async (req, res) => {
+    try {
+
+        // On définit le tableau global et la variable
+        const markets = []
+        let offset = 0
+
+        while (true) {
+            // Appel API avec les paramètres
+            const request = await axios.get('https://gamma-api.polymarket.com/markets', {
+                params: { closed: false, limit: "500", order: "volumeNum", ascending: "false", end_date_min: getTodayISO(), offset: offset },
+                headers: { 'accept': 'application/json', 'content-type': 'application/json' }
+            });
+            // On rajoute les éléments au tableau global
+            markets.push(...request.data)
+
+            if (request.data.length < 500) {
+                break
+            }
+
+            offset += 500
+        }
+
+        const response = markets
+            .filter(i => i.marketType !== 'scalar' && i.outcomePrices)
+            .map(i => {
+
+                return {
+                    label: i.question,
+                    value: i.id,
+                }
+            })
+
+        res.json(response);
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ error: 'Erreur lors de la récupération des instruments.' });
+    }
+};
+
+module.exports = { getMarkets, getSingleMarket, getPriceHistory, getMarketsName };
+
+
