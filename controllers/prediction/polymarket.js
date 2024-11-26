@@ -181,6 +181,48 @@ const getMarketsName = async (req, res) => {
     }
 };
 
-module.exports = { getMarkets, getSingleMarket, getPriceHistory, getMarketsName };
+// Handler pour 'prediction/polymarket/markets'
+const getMarketsNameById = async (req, res) => {
+    try {
+
+        // On définit le tableau global et la variable
+        const markets = []
+        let offset = 0
+
+        while (true) {
+            // Appel API avec les paramètres
+            const request = await axios.get('https://gamma-api.polymarket.com/markets', {
+                params: { closed: false, limit: "500", order: "volumeNum", ascending: "false", end_date_min: getTodayISO(), offset: offset },
+                headers: { 'accept': 'application/json', 'content-type': 'application/json' }
+            });
+            // On rajoute les éléments au tableau global
+            markets.push(...request.data)
+
+            if (request.data.length < 500) {
+                break
+            }
+
+            offset += 500
+        }
+
+        const response = markets
+            .filter(i => i.marketType !== 'scalar' && i.outcomePrices)
+            .map(i => {
+
+                return {
+                    label: i.conditionId,
+                    value: i.id,
+                }
+            })
+
+            res.json(response);
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ error: 'Erreur lors de la récupération des instruments.' });
+    }
+};
+
+module.exports = { getMarkets, getSingleMarket, getPriceHistory, getMarketsName, getMarketsNameById };
 
 

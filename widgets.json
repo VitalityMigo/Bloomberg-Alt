@@ -238,5 +238,65 @@
         ],
         "refetchInterval": 3600000,
         "staleTime": 300000
+    },
+    "polymarket_market_history": {
+        "name": "Market Price History",
+        "description": "Display a Polymarket market price history",
+        "endpoint": "/prediction/polymarket/pricehistory",
+        "category": "Prediction",
+        "subCategory": "Polymarket",
+        "data": {
+            "table": {
+                "enableCharts": true,
+                "showAll": true,
+                "columnsDefs": [
+                    {
+                        "field": "date",
+                        "headerName": "Date"
+                    },
+                    {
+                        "field": "price",
+                        "headerName": "Price"
+                    }
+                ],
+                "chartView": {
+                    "enabled": true,
+                    "chartType": "area"
+                }
+            }
+        },
+        "params": [
+            {
+                "paramName": "tokenId",
+                "description": "Select a chain to get historical TVL",
+                "value": "255229",
+                "label": "Market",
+                "type": "endpoint",
+                "optionsEndpoint": "/prediction/polymarket/marketslabel"
+            },
+            {
+                "type": "text",
+                "paramName": "interval",
+                "value": "1w",
+                "label": "Interval",
+                "show": true,
+                "description": "Chart interval",
+                "multiSelect": true,
+                "options": [
+                  { "label": "1 hour", "value": "1h" },
+                  { "label": "6 hours", "value": "6h" },
+                  { "label": "1 day", "value": "1d" },
+                  { "label": "1 week", "value": "1w" },
+                  { "label": "1 month", "value": "1m" },
+                  { "label": "Max Range", "value": "max" }
+
+                ]
+            }
+        ],
+        "source": [
+            "Polymarket"
+        ],
+        "refetchInterval": 3600000,
+        "staleTime": 300000
     }
 }
