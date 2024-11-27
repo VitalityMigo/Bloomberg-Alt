@@ -226,11 +226,11 @@
         "params": [
             {
                 "paramName": "id",
-                "description": "Select a chain to get historical TVL",
+                "description": "Select a market to analyse",
                 "value": "255229",
                 "label": "Market",
                 "type": "endpoint",
-                "optionsEndpoint": "/prediction/polymarket/marketslabel"
+                "optionsEndpoint": "/prediction/polymarket/markets-headers?id_type=id"
             }
         ],
         "source": [
@@ -252,36 +252,39 @@
                 "columnsDefs": [
                     {
                         "field": "date",
-                        "headerName": "Date"
+                        "headerName": "Date",
+                        "cellDataType": "date"
                     },
                     {
                         "field": "price",
-                        "headerName": "Price"
+                        "headerName": "Price",
+                        "cellDataType": "number",
+                        "formatterFn": "normalizedPercent"
                     }
                 ],
                 "chartView": {
                     "enabled": true,
-                    "chartType": "area"
+                    "chartType": "line"
                 }
             }
         },
         "params": [
             {
                 "paramName": "tokenId",
-                "description": "Select a chain to get historical TVL",
-                "value": "255229",
+                "description": "Select a market to chart",
+                "value": "66714239224313823221640294891961335457341276313024833480429172445133070011668",
                 "label": "Market",
                 "type": "endpoint",
-                "optionsEndpoint": "/prediction/polymarket/marketslabel"
+                "optionsEndpoint": "/prediction/polymarket/markets-headers?id_type=clobTokenId"
             },
             {
-                "type": "text",
                 "paramName": "interval",
+                "type": "text",
                 "value": "1w",
                 "label": "Interval",
                 "show": true,
                 "description": "Chart interval",
-                "multiSelect": true,
+                "multiSelect": false,
                 "options": [
                   { "label": "1 hour", "value": "1h" },
                   { "label": "6 hours", "value": "6h" },
@@ -289,7 +292,19 @@
                   { "label": "1 week", "value": "1w" },
                   { "label": "1 month", "value": "1m" },
                   { "label": "Max Range", "value": "max" }
-
+                ]
+            },
+            {
+               "paramName": "outcome",
+                "type": "text",
+                "value": "yes",
+                "label": "Outcome",
+                "show": true,
+                "description": "The outcome to chart",
+                "multiSelect": false,
+                "options": [
+                  { "label": "Yes", "value": "yes" },
+                  { "label": "No", "value": "no" }
                 ]
             }
         ],

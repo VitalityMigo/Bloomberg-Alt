@@ -111,12 +111,15 @@ const getSingleMarket = async (req, res) => {
 
 // Handler pour 'prediction/polymarket/pricehistory'
 const getPriceHistory = async (req, res) => {
-    const { tokenId, interval } = req.query;
+    const { tokenId, interval, outcome } = req.query;
     try {
 
+        // Fidelity is f(interval)
+        const fidelity_param = { ["1h"]: 1, ["6h"]: 1, ["1d"]: 5, ["1w"]: 30, ["1m"]: 180, ["max"]: 720 }
+
         // Appel API avec les paramètres
-        const markets = await axios.get(`https://clob.polymarket.com//prices-history`, {
-            params: { market: tokenId, interval: interval, },
+        const markets = await axios.get(`https://clob.polymarket.com/prices-history`, {
+            params: { market: tokenId, interval: interval, fidelity: fidelity_param[interval] },
             headers: { 'accept': 'application/json', 'content-type': 'application/json' }
         });
 
@@ -127,7 +130,7 @@ const getPriceHistory = async (req, res) => {
 
                 return {
                     date: formatDatePlain(i.t),
-                    price: (i.p * 100) + "%",
+                    price: outcome === 'yes' ? i.p : 1 - i.p,
                 }
             })
 
@@ -139,10 +142,12 @@ const getPriceHistory = async (req, res) => {
     }
 };
 
-// Handler pour 'prediction/polymarket/markets'
-const getMarketsName = async (req, res) => {
+// Handler pour 'prediction/polymarket/marketsheader'
+const getMarketsHeaders = async (req, res) => {
+    const { id_type } = req.query;
     try {
-
+        // clobTokenId or id
+console.log(id_type)
         // On définit le tableau global et la variable
         const markets = []
         let offset = 0
@@ -164,12 +169,14 @@ const getMarketsName = async (req, res) => {
         }
 
         const response = markets
-            .filter(i => i.marketType !== 'scalar' && i.outcomePrices)
+            .filter(i => i.marketType !== 'scalar' && i.outcomePrices && i.clobTokenIds)
             .map(i => {
+
+                const id = id_type === 'id' ? i.id : JSON.parse(i.clobTokenIds)[0]
 
                 return {
                     label: i.question,
-                    value: i.id,
+                    value: id,
                 }
             })
 
@@ -181,48 +188,7 @@ const getMarketsName = async (req, res) => {
     }
 };
 
-// Handler pour 'prediction/polymarket/markets'
-const getMarketsNameById = async (req, res) => {
-    try {
 
-        // On définit le tableau global et la variable
-        const markets = []
-        let offset = 0
-
-        while (true) {
-            // Appel API avec les paramètres
-            const request = await axios.get('https://gamma-api.polymarket.com/markets', {
-                params: { closed: false, limit: "500", order: "volumeNum", ascending: "false", end_date_min: getTodayISO(), offset: offset },
-                headers: { 'accept': 'application/json', 'content-type': 'application/json' }
-            });
-            // On rajoute les éléments au tableau global
-            markets.push(...request.data)
-
-            if (request.data.length < 500) {
-                break
-            }
-
-            offset += 500
-        }
-
-        const response = markets
-            .filter(i => i.marketType !== 'scalar' && i.outcomePrices)
-            .map(i => {
-
-                return {
-                    label: i.conditionId,
-                    value: i.id,
-                }
-            })
-
-            res.json(response);
-
-    } catch (error) {
-        console.log(error)
-        res.status(500).json({ error: 'Erreur lors de la récupération des instruments.' });
-    }
-};
-
-module.exports = { getMarkets, getSingleMarket, getPriceHistory, getMarketsName, getMarketsNameById };
+module.exports = { getMarkets, getSingleMarket, getPriceHistory, getMarketsHeaders };
 
 
