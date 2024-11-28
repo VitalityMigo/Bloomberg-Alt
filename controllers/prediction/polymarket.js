@@ -142,12 +142,54 @@ const getPriceHistory = async (req, res) => {
     }
 };
 
+// Handler pour 'prediction/polymarket/singlemarket'
+const getOrderbook = async (req, res) => {
+    const { tokenId } = req.query;
+    try {
+
+        // Appel API avec les paramètres
+        const markets = await axios.get(`https://clob.polymarket.com/book`, {
+            params: { token_id: tokenId },
+            headers: { 'accept': 'application/json', 'content-type': 'application/json' }
+        });
+
+        const data = markets.data
+
+        console.log(data)
+jj
+        // Parser outcomes et outcomePrices
+        const outcomePrices = JSON.parse(data.outcomePrices);
+        const spread = data.spread * 100
+
+        const response = {
+            Market: data.question,
+            ["Y-Prob"]: parseFloat(parseFloat(outcomePrices[0]) * 100).toFixed(1) + "%",
+            ["N-Prob"]: (parseFloat(outcomePrices[1]) * 100).toFixed(1) + "%",
+            Spread: parseFloat(spread).toFixed(1),
+            Volume: parseInt(data.volumeNum),
+            Liquidity: parseInt(data.liquidityNum),
+            Resolution: formatDate(data.endDate),
+            Link: `https://polymarket.com/market/${data.slug}`,
+            Id: data.id,
+        }
+
+        // // Transposer l'objet en un tableau clé-valeur
+        const transposed = Object.entries(response);
+
+        res.json(transposed);
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ error: 'Erreur lors de la récupération des instruments.' });
+    }
+};
+
 // Handler pour 'prediction/polymarket/marketsheader'
 const getMarketsHeaders = async (req, res) => {
     const { id_type } = req.query;
     try {
         // clobTokenId or id
-console.log(id_type)
+        console.log(id_type)
         // On définit le tableau global et la variable
         const markets = []
         let offset = 0
@@ -189,6 +231,12 @@ console.log(id_type)
 };
 
 
-module.exports = { getMarkets, getSingleMarket, getPriceHistory, getMarketsHeaders };
+module.exports = {
+    getMarkets,
+    getSingleMarket,
+    getPriceHistory,
+    getOrderbook,
+    getMarketsHeaders,
+};
 
 

@@ -272,7 +272,7 @@
             {
                 "paramName": "tokenId",
                 "description": "Select a market to chart",
-                "value": "66714239224313823221640294891961335457341276313024833480429172445133070011668",
+                "value": "64903093311385616430821497488306433314807585397286521531639186532059591846310",
                 "label": "Market",
                 "type": "endpoint",
                 "optionsEndpoint": "/prediction/polymarket/markets-headers?id_type=clobTokenId"
@@ -293,6 +293,64 @@
                   { "label": "1 month", "value": "1m" },
                   { "label": "Max Range", "value": "max" }
                 ]
+            },
+            {
+               "paramName": "outcome",
+                "type": "text",
+                "value": "yes",
+                "label": "Outcome",
+                "show": true,
+                "description": "The outcome to chart",
+                "multiSelect": false,
+                "options": [
+                  { "label": "Yes", "value": "yes" },
+                  { "label": "No", "value": "no" }
+                ]
+            }
+        ],
+        "source": [
+            "Polymarket"
+        ],
+        "refetchInterval": 3600000,
+        "staleTime": 300000
+    },
+    "polymarket_orderbook": {
+        "name": "Market Orderbook",
+        "description": "Display a Polymarket market orderbook",
+        "endpoint": "/prediction/polymarket/orderbook",
+        "category": "Prediction",
+        "subCategory": "Polymarket",
+        "data": {
+            "table": {
+                "enableCharts": true,
+                "showAll": true,
+                "columnsDefs": [
+                    {
+                        "field": "date",
+                        "headerName": "Date",
+                        "cellDataType": "date"
+                    },
+                    {
+                        "field": "price",
+                        "headerName": "Price",
+                        "cellDataType": "number",
+                        "formatterFn": "normalizedPercent"
+                    }
+                ],
+                "chartView": {
+                    "enabled": true,
+                    "chartType": "bar"
+                }
+            }
+        },
+        "params": [
+            {
+                "paramName": "tokenId",
+                "description": "Select an orderbook to display",
+                "value": "64903093311385616430821497488306433314807585397286521531639186532059591846310",
+                "label": "Market",
+                "type": "endpoint",
+                "optionsEndpoint": "/prediction/polymarket/markets-headers?id_type=clobTokenId"
             },
             {
                "paramName": "outcome",
