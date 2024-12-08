@@ -320,29 +320,6 @@
         "endpoint": "/prediction/polymarket/orderbook",
         "category": "Prediction",
         "subCategory": "Polymarket",
-        "data": {
-            "table": {
-                "enableCharts": true,
-                "showAll": true,
-                "columnsDefs": [
-                    {
-                        "field": "date",
-                        "headerName": "Date",
-                        "cellDataType": "date"
-                    },
-                    {
-                        "field": "price",
-                        "headerName": "Price",
-                        "cellDataType": "number",
-                        "formatterFn": "normalizedPercent"
-                    }
-                ],
-                "chartView": {
-                    "enabled": true,
-                    "chartType": "bar"
-                }
-            }
-        },
         "params": [
             {
                 "paramName": "tokenId",

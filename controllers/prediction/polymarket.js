@@ -142,7 +142,7 @@ const getPriceHistory = async (req, res) => {
     }
 };
 
-// Handler pour 'prediction/polymarket/singlemarket'
+// Handler pour 'prediction/polymarket/book'
 const getOrderbook = async (req, res) => {
     const { tokenId } = req.query;
     try {
@@ -153,30 +153,57 @@ const getOrderbook = async (req, res) => {
             headers: { 'accept': 'application/json', 'content-type': 'application/json' }
         });
 
-        const data = markets.data
+        const bids = markets.data.bids
+        const asks = markets.data.asks
 
-        console.log(data)
-jj
-        // Parser outcomes et outcomePrices
-        const outcomePrices = JSON.parse(data.outcomePrices);
-        const spread = data.spread * 100
+        // Convertir les prix et tailles en nombres
+        const bidsData = bids.map(bid => ({ price: parseFloat(bid.price), size: parseFloat(bid.size) }));
+        const asksData = asks.map(ask => ({ price: parseFloat(ask.price), size: parseFloat(ask.size) }));
 
-        const response = {
-            Market: data.question,
-            ["Y-Prob"]: parseFloat(parseFloat(outcomePrices[0]) * 100).toFixed(1) + "%",
-            ["N-Prob"]: (parseFloat(outcomePrices[1]) * 100).toFixed(1) + "%",
-            Spread: parseFloat(spread).toFixed(1),
-            Volume: parseInt(data.volumeNum),
-            Liquidity: parseInt(data.liquidityNum),
-            Resolution: formatDate(data.endDate),
-            Link: `https://polymarket.com/market/${data.slug}`,
-            Id: data.id,
-        }
+        // Calculer le prix d'équilibre
+        const bestBid = bidsData[bidsData.length - 1].price
+        const bestAsk = asksData[asksData.length - 1].price
+        const equilibriumPrice = (bestBid + bestAsk) / 2;
 
-        // // Transposer l'objet en un tableau clé-valeur
-        const transposed = Object.entries(response);
+        // Filtrer les données pour ne garder que les ordres à + ou - 20% du prix d'équilibre
+        const filteredBids = bidsData.filter(bid => bid.price >= equilibriumPrice * 0.75);
+        const filteredAsks = asksData.filter(ask => ask.price <= equilibriumPrice * 1.25);
 
-        res.json(transposed);
+        console.log("Bids", filteredBids)
+        console.log("Asks", filteredAsks)
+
+        // Créer les traces pour Plotly
+        const bidTrace = {
+            x: filteredBids.map(bid => bid.price),
+            y: filteredBids.map(bid => bid.size),
+            type: 'bar',
+            orientation: 'h',
+            name: 'Bids',
+            marker: { color: 'green' }
+        };
+
+        const askTrace = {
+            x: filteredAsks.map(ask => ask.price),
+            y: filteredAsks.map(ask => ask.size),
+            type: 'bar',
+            orientation: 'h',
+            name: 'Asks',
+            marker: { color: 'red' }
+        };
+
+        const layout = {
+            barmode: 'relative',
+            title: 'Order Book',
+            xaxis: { title: 'Price' },
+            yaxis: { title: 'Size' }
+        };
+
+        const figure = { data: [bidTrace, askTrace], layout };
+
+        // Convertir le graphique en JSON
+        const graphJSON = JSON.stringify(figure, null, 2);
+
+        res.json(graphJSON);
 
     } catch (error) {
         console.log(error)
@@ -188,8 +215,7 @@ jj
 const getMarketsHeaders = async (req, res) => {
     const { id_type } = req.query;
     try {
-        // clobTokenId or id
-        console.log(id_type)
+       
         // On définit le tableau global et la variable
         const markets = []
         let offset = 0

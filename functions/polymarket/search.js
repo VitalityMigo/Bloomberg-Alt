@@ -1,6 +1,6 @@
 function searchMarkets(data, input) {
     // Vérifie si l'input est vide ou undefined
-    console.log(input)
+
     if (!input) {
         return data; // Retourne le tableau complet si aucun filtre
     }
